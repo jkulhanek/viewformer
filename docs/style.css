@@ -1,0 +1,154 @@
+* {
+  font-family: 'Lato', sans-serif;
+}
+
+header {
+  margin: 4em 0px 2em 0px;
+}
+
+body {
+  max-width: 75ch;
+  margin: 0px auto;
+}
+
+body.wide {
+  max-width: 86%;
+}
+
+h2 {
+  font-weight: 400;
+}
+
+h1 .title-main  {
+  font-weight: 700;
+  display: block;
+  text-align: center;
+}
+
+h1 .title-small  {
+  font-size: 0.8em;
+  display: block;
+  text-align: center;
+  font-weight: 500;
+}
+
+.authors {
+  display: flex;
+}
+
+.authors > * {
+  padding: 0px 1em;
+  flex: 1 1 0px;
+  margin: 0em 0px 0.8em 0px;
+}
+
+.authors .author-name {
+  font-weight: 700;
+  font-size: 1.1em;
+  display: block;
+  text-align: center;
+  margin-bottom: 0.2em;
+}
+
+.authors .author-name a {
+  text-decoration: none;
+  color: black;
+}
+
+.authors .author-affiliation {
+  display: block;
+  text-align: center;
+}
+
+.links {
+  margin: 1em auto 1em auto;
+  text-align: center;
+  font-size: 1.5em;
+}
+
+.links .link {
+  display: inline-block;
+  padding: 0 0.2em;
+}
+
+.video {
+  position: relative;
+}
+
+.video::before {
+  display: block;
+  padding-bottom: 37.5%;
+  content: '';
+}
+
+.video.d16x9::before {
+  padding-bottom: 56.25%;
+}
+
+.video video {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+.abstract p {
+  text-align: justify;
+}
+
+.references div {
+  text-align: justify;
+  font-size: 0.9em;
+}
+
+.citation {
+  color: black;
+}
+
+pre {
+  margin-top: 0.2em;
+  font-family: 'Open Sans',sans-serif;
+  font-size: 0.8em;
+  background-color: #eeeeee;
+  padding: 1em 2em 1em 2em;
+  white-space: pre-wrap;
+}
+
+section {
+  margin: 2em 0;
+}
+
+@media (max-width:1120px) {
+  body {
+    margin: 0px 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .github-corner {
+    display: none;
+  }
+
+  body {
+    font-size: 14px;
+    margin: 0px 40px;
+  }
+
+  .authors {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .authors > * {
+    padding: 0px 1em;
+    flex: 1 1 0px;
+  }
+}
+
+@media (max-width: 400px) {
+  body {
+    font-size: 12px;
+    margin: 0px 20px;
+  }
+}
