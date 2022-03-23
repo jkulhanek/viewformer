@@ -9,7 +9,8 @@ import fnmatch
 import tempfile
 import os
 import copy
-from typing import Union, List, Literal
+from aparse import Literal
+from typing import Union, List
 from tqdm import tqdm
 from viewformer.utils import SplitIndices
 from viewformer.utils import unique, batch_slice, batch_len

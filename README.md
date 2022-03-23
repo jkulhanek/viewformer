@@ -12,6 +12,7 @@ It is evaluated on previously unseen 3D scenes.
 <br>
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg?style=for-the-badge)](https://colab.research.google.com/github/jkulhanek/viewformer/blob/master/notebooks/viewformer-playground.ipynb)
+![Python Versions](https://img.shields.io/badge/Python-3.7%20%7C%203.8%20%7C%203.9-blue)
 
 ## Getting started
 Start by creating a python 3.8 venv. From the activated environment,

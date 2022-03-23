@@ -2,7 +2,7 @@ import os
 import json
 import random
 from collections import defaultdict
-from typing import Literal
+from aparse import Literal
 from aparse import click
 from typing import List, Optional
 import numpy as np

@@ -1,5 +1,6 @@
 import copy
-from typing import Tuple, List, Optional, Literal
+from typing import Tuple, List, Optional
+from aparse import Literal
 from dataclasses import dataclass, fields, field, is_dataclass
 from viewformer.utils.schedules import Schedule
 
