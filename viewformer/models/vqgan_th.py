@@ -325,6 +325,7 @@ class VQGAN(pl.LightningModule):
     def __init__(self, config: VQGANConfig, use_mixed_precision: bool = False, **kwargs):
         assert not use_mixed_precision, "mixed precision is not supported by VQGAN model"
         super().__init__(**kwargs)
+        self.config = config
         self.encoder = Encoder(**vars(config))
         self.decoder = Decoder(**vars(config))
         self.quantize = QuantizeEMA(config.embed_dim, config.n_embed)
@@ -332,7 +333,8 @@ class VQGAN(pl.LightningModule):
         self.post_quant_conv = torch.nn.Conv2d(config.embed_dim, config.z_channels, 1)
         self.learning_rate = config.learning_rate
         self.perceptual_loss = lpips.LPIPS(net='vgg')
-        self.config = config
+        for p in self.perceptual_loss.parameters():
+            p.requires_grad = False
 
     def train(self, mode: bool = True):
         out = super().train(mode)
@@ -396,8 +398,7 @@ class VQGAN(pl.LightningModule):
     def _compute_loss(self, codebook_loss, inputs, reconstructions, split):
         rec_loss = torch.abs(inputs.contiguous() - reconstructions.contiguous())
         if self.config.perceptual_weight > 0:
-            with torch.no_grad():
-                p_loss = self.perceptual_loss(inputs.contiguous(), reconstructions.contiguous())
+            p_loss = self.perceptual_loss(inputs.contiguous(), reconstructions.contiguous())
             rec_loss = rec_loss + self.config.perceptual_weight * p_loss
         else:
             p_loss = torch.tensor([0.0])
