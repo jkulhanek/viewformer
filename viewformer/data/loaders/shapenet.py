@@ -3,7 +3,7 @@ from collections import defaultdict
 from functools import partial
 import numpy as np
 import sys
-from typing import List
+import typing as t
 from PIL import Image
 from viewformer.utils.geometry import rotation_matrix_to_quaternion, quaternion_normalize
 from viewformer.data._common import LazyArray
@@ -61,7 +61,7 @@ _SEQ_SIZES = {
 class ShapenetLoader:
     _images_per_scene = dict()
 
-    def __init__(self, path: str, split: str, categories: List[str] = None, seed=None, sequences=None):
+    def __init__(self, path: str, split: str, categories: t.List[str] = None, seed=None, sequences: t.List[str] = None):
         assert split in ['test', 'train']
         if categories is None:
             categories = ALL_CATEGORIES
@@ -127,9 +127,3 @@ class ShapenetLoader:
         output['frames'] = LazyArray(indices, partial(self.read_image, cat, seq_name))
         output['sequence_id'] = seq_name
         return output
-
-
-if __name__ == '__main__':
-    ll = ShapenetLoader(sys.argv[1])
-    ll[0]
-    breakpoint()

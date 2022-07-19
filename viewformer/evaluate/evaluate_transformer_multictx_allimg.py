@@ -112,6 +112,7 @@ def main(loader: LoaderSwitch,
          job_dir: str,
          context_views: List[int] = None,
          pose_multiplier: Optional[float] = None,
+         keep_last_frame: bool = False,
          image_size: Optional[int] = None):
     transformer_config = dict()
     if pose_multiplier is not None:
@@ -135,9 +136,31 @@ def main(loader: LoaderSwitch,
             generated_cameras, generated_codes = [], []
             tcodes = np.concatenate([np.stack([codes[:, j] for j in c_context_views + [i]], 1) for i in range(len(seq['frames']))], 0)
             tcameras = np.concatenate([np.stack([cameras[:, j] for j in c_context_views + [i]], 1) for i in range(len(seq['frames']))], 0)
-            generated_cameras, generated_codes = run_with_batchsize(transformer_predict, 128, tcameras, tcodes, transformer_model=transformer_model)
 
             # Decode images
+            if keep_last_frame:
+                generated_codes = []
+                generated_cameras = []
+                last_frame = None
+                for i in range(tcodes.shape[0]):
+                    lcodes = tcodes[i: i+1]
+                    lcameras = tcameras[i: i+1]
+                    if last_frame:
+                        last_codes, last_cameras = last_frame
+                        lcodes = tf.concat([last_codes, lcodes], 1)
+                        lcameras = tf.concat([last_cameras, lcameras], 1)
+                    lgcameras, lgcodes = transformer_predict(lcameras, lcodes, transformer_model=transformer_model)
+                    if last_frame is not None:
+                        lgcodes, lgcameras = lgcodes[:, 1:], lgcameras[:, 1:]
+                    generated_codes.append(lgcodes)
+                    generated_cameras.append(lgcameras)
+                    last_frame = (lgcodes[:, -1:], lcameras[:, -1:])
+
+                generated_codes = tf.concat(generated_codes, 0)
+                generated_cameras = tf.concat(generated_cameras, 0)
+            else:
+                generated_cameras, generated_codes = run_with_batchsize(transformer_predict, 128, tcameras, tcodes, transformer_model=transformer_model)
+
             generated_images = run_with_batchsize(decode_code, 64, generated_codes, codebook_model=codebook_model)
             eval_frames = [x for x in range(len(generated_images)) if x not in c_context_views]
             evaluator.update_state(
