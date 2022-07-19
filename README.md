@@ -14,6 +14,18 @@ It is evaluated on previously unseen 3D scenes.
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg?style=for-the-badge)](https://colab.research.google.com/github/jkulhanek/viewformer/blob/master/notebooks/viewformer-playground.ipynb)
 ![Python Versions](https://img.shields.io/badge/Python-3.7%20%7C%203.8%20%7C%203.9-blue)
 
+
+## Citation
+If you use this code for an academic publication, please cite the corresponding paper using the following citation:
+```
+@inproceedings{kulhanek2022viewformer,
+  title={ViewFormer: NeRF-free Neural Rendering from Few Images Using Transformers},
+  author={Kulh{\'a}nek, Jon{\'a}{\v{s}} and Derner, Erik and Sattler, Torsten and Babu{\v{s}}ka, Robert},
+  booktitle={European Conference on Computer Vision (ECCV)},
+  year={2022},
+}
+```
+
 ## Getting started
 Start by creating a python 3.8 venv. From the activated environment,
 you can run the following command in the directory containing `setup.py`:
