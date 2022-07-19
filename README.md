@@ -402,14 +402,3 @@ You can change `--top-n-matched-images` to 0 if you don't want to use top 10 clo
 We would like to express our sincere gratitude to the authors of the following repositories, that we used in our code:
 - [DeepMind Sonnet](https://github.com/deepmind/sonnet) 
 - [Official implementation of Taming Transformers for High-Resolution Image Synthesis](https://github.com/CompVis/taming-transformers)
-
-## Citation
-If you found this work useful and would like to use it in an academic publication, please use the following citation:
-```
-@inproceedings{kulhanek2022viewformer,
-  title={ViewFormer: NeRF-free Neural Rendering from Few Images Using Transformers},
-  author={Kulh{\'a}nek, Jon{\'a}{\v{s}} and Derner, Erik and Sattler, Torsten and Babu{\v{s}}ka, Robert},
-  booktitle={European Conference on Computer Vision (ECCV)},
-  year={2022},
-}
-```
