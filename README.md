@@ -33,6 +33,30 @@ you can run the following command in the directory containing `setup.py`:
 pip install -e .
 ```
 
+## Model checkpoints
+All model checkpoints are available online here:
+```
+https://data.ciirc.cvut.cz/public/projects/2022ViewFormer/checkpoints
+```
+
+All evaluation commands will download and extract the appropriate checkpoint automatically if you specify the checkpoint as one of the following:
+```
+7scenes-finetune-both-transformer-tf	 
+7scenes-finetune-transformer-transformer-tf
+7scenes-finetuned-interiornet-codebook-th
+co3d-10cat-codebook-th
+co3d-10cat-noloc-transformer-tf
+co3d-10cat-transformer-tf
+co3d-all-noloc-transformer-tf
+interiornet-codebook-th
+interiornet-transformer-tf
+shapenet-srn-codebook-th
+shapenet-srn-transforner-tf
+sm7-codebook-th
+sm7-transformer-tf
+```
+All evaluation commands will need one transformer model (a model ending with `-transformer-tf`), and the associated codebook model (a model ending with `-codebook-th`). Please read the evaluation section for more details. You are also advised to explore the demo notebook.
+
 ## Getting datasets
 In this section, we describe how you can prepare the data for training. We assume that you
 have your environment ready and you want to store the dataset into `{output path}` directory.
