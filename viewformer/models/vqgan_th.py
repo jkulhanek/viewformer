@@ -398,7 +398,7 @@ class VQGAN(pl.LightningModule):
     def _compute_loss(self, codebook_loss, inputs, reconstructions, split):
         rec_loss = torch.abs(inputs.contiguous() - reconstructions.contiguous())
         if self.config.perceptual_weight > 0:
-            p_loss = self.perceptual_loss(inputs.contiguous(), reconstructions.contiguous())
+            p_loss = self.perceptual_loss(inputs[..., :3, :, :].contiguous(), reconstructions[..., :3, :, :].contiguous())
             rec_loss = rec_loss + self.config.perceptual_weight * p_loss
         else:
             p_loss = torch.tensor([0.0])
@@ -435,7 +435,7 @@ class VQGAN(pl.LightningModule):
         result = dict()
         if batch_idx == 0 and self.trainer.global_rank == 0:
             # For the first batch, we will also render the generation image
-            result['reconstructed_image'] = xrec
+            result['reconstructed_image'] = xrec[..., :3, :, :]
         return result
 
     def configure_optimizers(self):

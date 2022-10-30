@@ -206,9 +206,10 @@ class ImageDataset(torch.utils.data.IterableDataset):
     def _parse_example(self, frames):
         images = []
         for array in frames:
-            pic = Image.open(BytesIO(array)).convert('RGB')
+            pic = Image.open(BytesIO(array))
             img = torch.from_numpy(np.array(pic, np.uint8, copy=True))
-            images.append(img.permute((2, 0, 1)))
+            img = img.permute((2, 0, 1))
+            images.append(img)
         images = torch.stack(images, 0).contiguous()
         images = images.to(dtype=torch.float32).div(255)
         if self.image_size is not None:

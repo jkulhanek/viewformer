@@ -275,7 +275,7 @@ class VQGAN(tf.keras.Model):
         self.metrics_dict = OrderedDict([(x.name, x) for x in self.metrics])
 
         # Initialize model
-        init_input = tf.random.normal((1, config.image_size, config.image_size, 3), dtype=tf.float32)
+        init_input = tf.random.normal((1, config.image_size, config.image_size, config.in_channels), dtype=tf.float32)
         self(init_input, training=False)
 
     @property

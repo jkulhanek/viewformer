@@ -292,6 +292,8 @@ def generate_dataset_from_loader(
             features.append('cameras-gqn')
     num_all_shards = len(shard_seqs)
     dataset_info['frame_size'] = first_batch['frames'].shape[-2]
+    dataset_info['num_image_channels'] = first_batch['frames'].shape[-1]
+    assert dataset_info['num_image_channels'] in {3, 4}
     dataset_info['features'] = features
 
     sequence_size = getattr(loader, 'sequence_size', None)

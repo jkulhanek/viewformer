@@ -101,7 +101,7 @@ def load_image_dataset(path: str, batch_size: int, image_size: int, repeat: int 
 
         def preprocess_data(frame):
             frame = tf.io.decode_image(frame, dtype=tf.float32)
-            frame = tf.ensure_shape(frame, (info['frame_size'], info['frame_size'], 3))
+            frame = tf.ensure_shape(frame, (info['frame_size'], info['frame_size'], info.get("num_image_channels", 3)))
             frame = transform_image(frame)
             return frame
 
@@ -198,7 +198,7 @@ def load_token_dataset(path: str, batch_size: int, sequence_size: int, token_ima
 
 
 def format_image(image):
-    if len(tf.shape(image)) > 1 and tf.shape(image)[-3] == 3:
+    if len(tf.shape(image)) > 1 and int(tf.shape(image)[-3]) in {3, 4}:
         image = tf.transpose(image, (0, 2, 3, 1))
     return image
 
@@ -316,7 +316,10 @@ def write_shard(path, data, features: List[str]):
                 value = tf.convert_to_tensor(sequence['frames'])
                 value = format_image(value)
                 if hasattr(value[0], 'dtype') and value[0].dtype == 'uint8':
-                    value = [x.numpy() for x in tf.map_fn(tf.image.encode_jpeg, value, dtype=tf.string)]
+                    encode_op = tf.image.encode_jpeg
+                    if value[0].shape[-1] == 4:
+                        encode_op = tf.image.encode_png
+                    value = [x.numpy() for x in tf.map_fn(encode_op, value, dtype=tf.string)]
                 feature['frames'] = tf.train.Feature(bytes_list=tf.train.BytesList(value=value))
             example = tf.train.Example(features=tf.train.Features(feature=feature))
             current_writer.write(example.SerializeToString())

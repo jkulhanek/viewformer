@@ -3,6 +3,7 @@ from aparse import click
 from typing import List
 from viewformer.utils import SplitIndices
 from viewformer.data import transform_dataset
+import numpy as np
 
 # Use memory growth for tf
 try:
@@ -18,10 +19,10 @@ except ImportError:
 
 class LatentCodeTransformer:
     def _convert_image_type(self, image):
+        if image.shape[-1] == 3 or image.shape[-1] == 4:
+            image = image.transpose((0, 3, 1, 2))
         if image.dtype == 'uint8':
             image = (image.astype('float32') / 255.) * 2. - 1.
-        if image.shape[-1] == 3:
-            image = image.transpose((0, 3, 1, 2))
         return image
 
     def update_dataset_info(self, dataset_info):

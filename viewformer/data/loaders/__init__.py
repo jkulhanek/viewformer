@@ -5,6 +5,7 @@ from .dataset import DatasetLoader
 from .sevenscenes import SevenScenesLoader
 from .colors import ColorsLoader
 from .co3d import CO3DLoader
+from .co3dv2 import CO3Dv2Loader
 from .shapenet import ShapenetLoader
 from .sm7 import SM7Loader
 from viewformer.data._common import ShuffledLoader, FixedSequenceSizeLoader, ChangedImageSizeLoader
@@ -98,3 +99,4 @@ ColorsLoader = register_loader(ColorsLoader)
 CO3DLoader = register_loader(CO3DLoader)
 ShapenetLoader = register_loader(ShapenetLoader)
 SM7Loader = register_loader(SM7Loader)
+CO3Dv2Loader = register_loader(CO3Dv2Loader)
