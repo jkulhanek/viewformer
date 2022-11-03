@@ -45,9 +45,12 @@ All evaluation commands will download and extract the appropriate checkpoint aut
 7scenes-finetune-transformer-transformer-tf
 7scenes-finetuned-interiornet-codebook-th
 co3d-10cat-codebook-th
+co3d-all-codebook-th
+co3dv2-all-codebook-th
 co3d-10cat-noloc-transformer-tf
 co3d-10cat-transformer-tf
 co3d-all-noloc-transformer-tf
+co3dv2-all-noloc-transformer-tf
 interiornet-codebook-th
 interiornet-transformer-tf
 shapenet-srn-codebook-th
@@ -421,6 +424,25 @@ viewformer-cli evaluate 7scenes \
     --image-match-map {path to top10 matched images}
 ```
 You can change `--top-n-matched-images` to 0 if you don't want to use top 10 closest images in the context. `{path to top10 matched images}` as a path to the file containing the map between most similar images from the test and the train sets. Each line is in the format `{relative test image path} {relative train image path}`.
+
+### CO3Dv2 challenge evaluation
+In order to evaluate the transformer model on the CO3Dv2 dataset, install the dataset first.
+Follow the instructions here: [https://github.com/facebookresearch/co3d](https://github.com/facebookresearch/co3d).
+Since at the moment if you install the dataset the click version gets downgraded, please fix it by 
+running the following
+```bash
+pip install --upgrade click
+```
+
+Download the CO3Dv2 dataset to a `{co3dv2 dataset root}` directory and run the following:
+```bash
+viewformer-cli evaluate co3dv2-challenge \
+    --dataset-root "{co3dv2 dataset root}" \
+    --output "{output path}" \
+    --split "{split (dev/test)}"
+```
+By default the appropriate checkpoint gets automatically downloaded. You can change it by supplying your own `--codebook-model` and `--transformer-model`.
+
 
 ## Thanks
 We would like to express our sincere gratitude to the authors of the following repositories, that we used in our code:

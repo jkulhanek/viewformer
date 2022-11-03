@@ -43,6 +43,7 @@ evaluate.add_command("viewformer.evaluate.evaluate_sevenscenes", "7scenes")
 evaluate.add_command("viewformer.evaluate.evaluate_sevenscenes_baseline", "7scenes-baseline")
 evaluate.add_command("viewformer.evaluate.evaluate_sevenscenes_multictx", "7scenes-multictx")
 evaluate.add_command("viewformer.evaluate.evaluate_co3d", "co3d")
+evaluate.add_command("viewformer.evaluate.evaluate_co3dv2_challenge", "co3dv2-challenge")
 evaluate.add_command("viewformer.evaluate.generate_gqn_images", "generate-gqn-images")
 
 main.add_command("viewformer.train", "train")
