@@ -85,7 +85,8 @@ h1 .title-small  {
   padding-bottom: 56.25%;
 }
 
-.video video {
+.video video,
+.video iframe{
   position: absolute;
   top: 0px;
   left: 0px;
