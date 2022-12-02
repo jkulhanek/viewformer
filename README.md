@@ -60,6 +60,13 @@ sm7-transformer-tf
 ```
 All evaluation commands will need one transformer model (a model ending with `-transformer-tf`), and the associated codebook model (a model ending with `-codebook-th`). Please read the evaluation section for more details. You are also advised to explore the demo notebook.
 
+## Predictions
+If you want to compare with our method, you can download the predictions here:
+```bash
+https://data.ciirc.cvut.cz/public/projects/2022ViewFormer/predictions/
+```
+If any dataset is missing, please open an issue.
+
 ## Getting datasets
 In this section, we describe how you can prepare the data for training. We assume that you
 have your environment ready and you want to store the dataset into `{output path}` directory.
