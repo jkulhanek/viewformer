@@ -14,8 +14,8 @@ wandb>=0.10.8
 pytest>=6.1.2
 pytest-benchmark>=3.2.3
 lpips==0.1.3
-onnx_tf==1.7.0
-onnx==1.7.0
+onnx_tf>=1.7.0
+onnx>=1.7.0
 einops>=0.3.2
 tqdm>=4.45.0
 aparse==0.0.14
