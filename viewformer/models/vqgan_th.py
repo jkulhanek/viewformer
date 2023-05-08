@@ -332,14 +332,16 @@ class VQGAN(pl.LightningModule):
         self.quant_conv = torch.nn.Conv2d(config.z_channels, config.embed_dim, 1)
         self.post_quant_conv = torch.nn.Conv2d(config.embed_dim, config.z_channels, 1)
         self.learning_rate = config.learning_rate
-        self.perceptual_loss = lpips.LPIPS(net='vgg')
+
+        # Exclude the metric from the checkpoint
+        object.__setattr__(self, "perceptual_loss", lpips.LPIPS(net='vgg'))
         for p in self.perceptual_loss.parameters():
             p.requires_grad = False
 
-    def train(self, mode: bool = True):
-        out = super().train(mode)
-        out.perceptual_loss.eval()
-        return out
+    def _apply(self, fn):
+        super()._apply(fn)
+        # To move perceptual loss to devices
+        fn(self.perceptual_loss)
 
     def load_state_dict(self, state_dict, strict: bool = True):
         # Add missing checkpoint attributes
