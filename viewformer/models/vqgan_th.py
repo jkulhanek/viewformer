@@ -339,9 +339,9 @@ class VQGAN(pl.LightningModule):
             p.requires_grad = False
 
     def _apply(self, fn):
-        super()._apply(fn)
         # To move perceptual loss to devices
-        fn(self.perceptual_loss)
+        self.perceptual_loss._apply(fn)
+        return super()._apply(fn)
 
     def load_state_dict(self, state_dict, strict: bool = True):
         # Add missing checkpoint attributes
