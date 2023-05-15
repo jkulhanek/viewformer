@@ -17,6 +17,7 @@ def transformer_predict(cameras, codes, *, transformer_model):
         # Rotate poses for relative augment
         cameras, transform = to_relative_cameras(cameras)
     cameras = normalize_cameras(cameras)
+    generated_cameras = None
 
     # Generate image tokens
     with tf.name_scope('transformer_generate_images'):
@@ -37,11 +38,13 @@ def transformer_predict(cameras, codes, *, transformer_model):
 
         # Format output
         generated_codes = tf.argmax(output['logits'], -1)
-        generated_cameras = transformer_model.reduce_cameras(output['pose_prediction'], -2)
+        if "pose_prediction" in output:
+            generated_cameras = transformer_model.reduce_cameras(output['pose_prediction'], -2)
 
     # Erase relative transform
-    if transformer_model.config.augment_poses == 'relative':
-        generated_cameras = from_relative_cameras(generated_cameras, transform)
+    if "pose_prediction" in output:
+        if transformer_model.config.augment_poses == 'relative':
+            generated_cameras = from_relative_cameras(generated_cameras, transform)
     return generated_cameras, generated_codes
 
 
@@ -53,10 +56,10 @@ def run_with_batchsize(fn, batch_size, *args, **kwargs):
         largs = [x[i * batch_size: (i+1) * batch_size] for x in args]
         louts = fn(*largs, **kwargs)
         outs.append(louts)
-    if isinstance(outs[0], tuple):
-        return tuple(tf.concat([x[i] for x in outs], 0) for i in range(len(outs[0])))
-    else:
+    if tf.is_tensor(outs[0]):
         return tf.concat(outs, 0)
+    else:
+        return tuple(tf.concat([x[i] for x in outs], 0) if outs[0][i] is not None else None for i in range(len(outs[0])))
 
 
 def encode_images(frames, *, codebook_model):
@@ -125,7 +128,8 @@ def main(loader: LoaderSwitch,
     rng = np.random.default_rng(42)
 
     with tqdm.tqdm(total=len(loader)) as progress:
-        for seq in loader:
+        for i, seq in enumerate(loader):
+            sequence_id = seq.get('sequence_id', f'{i:06d}')
             c_context_views = context_views
             if c_context_views is None:
                 c_context_views = list(rng.choice(len(seq['frames']), (n_context_views,), replace=False))
@@ -138,6 +142,7 @@ def main(loader: LoaderSwitch,
             tcameras = np.concatenate([np.stack([cameras[:, j] for j in c_context_views + [i]], 1) for i in range(len(seq['frames']))], 0)
 
             # Decode images
+            disable_cameras = False
             if keep_last_frame:
                 generated_codes = []
                 generated_cameras = []
@@ -151,15 +156,23 @@ def main(loader: LoaderSwitch,
                         lcameras = tf.concat([last_cameras, lcameras], 1)
                     lgcameras, lgcodes = transformer_predict(lcameras, lcodes, transformer_model=transformer_model)
                     if last_frame is not None:
-                        lgcodes, lgcameras = lgcodes[:, 1:], lgcameras[:, 1:]
+                        lgcodes = lgcodes[:, 1:]
+                        if lgcameras is not None:
+                            lgcameras = lgcameras[:, 1:]
                     generated_codes.append(lgcodes)
-                    generated_cameras.append(lgcameras)
+                    if lgcameras is not None:
+                        generated_cameras.append(lgcameras)
+                    else:
+                        disable_cameras = True
                     last_frame = (lgcodes[:, -1:], lcameras[:, -1:])
 
                 generated_codes = tf.concat(generated_codes, 0)
-                generated_cameras = tf.concat(generated_cameras, 0)
+                if not disable_cameras:
+                    generated_cameras = tf.concat(generated_cameras, 0)
             else:
                 generated_cameras, generated_codes = run_with_batchsize(transformer_predict, 128, tcameras, tcodes, transformer_model=transformer_model)
+            if disable_cameras:
+                generated_cameras = None
 
             generated_images = run_with_batchsize(decode_code, 64, generated_codes, codebook_model=codebook_model)
             eval_frames = [x for x in range(len(generated_images)) if x not in c_context_views]
@@ -167,24 +180,29 @@ def main(loader: LoaderSwitch,
                 ground_truth_cameras=tf.stack([cameras[0, x] for x in eval_frames], 0),
                 ground_truth_images=tf.stack([frames[0, x] for x in eval_frames], 0),
                 generated_images=tf.stack([generated_images[x] for x in eval_frames], 0),
-                generated_cameras=tf.stack([generated_cameras[x] for x in eval_frames], 0))
+                generated_cameras=tf.stack([generated_cameras[x] for x in eval_frames], 0) if generated_cameras is not None else None)
             for i in range(0, 1 + len(c_context_views)):
-                os.makedirs(os.path.join(job_dir, 'gen_images', seq['sequence_id'], f'gen-{i:02}'), exist_ok=True)
-            os.makedirs(os.path.join(job_dir, 'gen_images', seq['sequence_id'], 'gt'), exist_ok=True)
-            os.makedirs(os.path.join(job_dir, 'gen_images', seq['sequence_id'], 'ctx'), exist_ok=True)
+                os.makedirs(os.path.join(job_dir, 'gen_images', sequence_id, f'gen-{i:02}'), exist_ok=True)
+            os.makedirs(os.path.join(job_dir, 'gen_images', sequence_id, 'gt'), exist_ok=True)
+            os.makedirs(os.path.join(job_dir, 'gen_images', sequence_id, 'ctx'), exist_ok=True)
             for i, c in enumerate(c_context_views):
-                Image.fromarray(frames[0, c].numpy()).save(os.path.join(job_dir, 'gen_images', seq['sequence_id'], 'ctx', f'{i:02}-{c:03}.png'))
+                Image.fromarray(frames[0, c].numpy()).save(os.path.join(job_dir, 'gen_images', sequence_id, 'ctx', f'{i:02}-{c:03}.png'))
             for i, c in enumerate(frames[0]):
-                Image.fromarray(c.numpy()).save(os.path.join(job_dir, 'gen_images', seq['sequence_id'], 'gt', f'{i:03}.png'))
+                Image.fromarray(c.numpy()).save(os.path.join(job_dir, 'gen_images', sequence_id, 'gt', f'{i:03}.png'))
             for i, c in enumerate(generated_images):
                 for j, d in enumerate(c):
-                    Image.fromarray(d.numpy()).save(os.path.join(job_dir, 'gen_images', seq['sequence_id'], f'gen-{j:02}', f'{i:03}.png'))
+                    Image.fromarray(d.numpy()).save(os.path.join(job_dir, 'gen_images', sequence_id, f'gen-{j:02}', f'{i:03}.png'))
             progress.set_postfix(evaluator.get_progress_bar_info())
             progress.update()
 
+            if i % 20 == 0:
+                result = evaluator.result()
+                with open(os.path.join(job_dir, 'results.json'), 'w+') as f:
+                    json.dump(result, f, indent=4)
+
     result = evaluator.result()
     with open(os.path.join(job_dir, 'results.json'), 'w+') as f:
-        json.dump(result, f)
+        json.dump(result, f, indent=4)
     print('Results:')
     print_metrics(result)
 

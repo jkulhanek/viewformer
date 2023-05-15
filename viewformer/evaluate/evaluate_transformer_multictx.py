@@ -16,7 +16,11 @@ class MultiContextEvaluator:
         self._evaluators = [Evaluator(image_size=image_size) for _ in range(sequence_size - 1)]
 
     def update_state(self, ground_truth_cameras, generated_cameras, ground_truth_images, generated_images):
-        for i, (gen_cam, gen_img) in enumerate(zip(tf.unstack(generated_cameras, axis=1), tf.unstack(generated_images, axis=1))):
+        for i in range(tf.shape(generated_images)[1]):
+            gen_cam = None
+            if generated_cameras is not None:
+                gen_cam = generated_cameras[:, i]
+            gen_img = generated_images[:, i]
             if i == 0:
                 continue
             self._evaluators[i - 1].update_state(ground_truth_cameras, gen_cam, ground_truth_images, gen_img)

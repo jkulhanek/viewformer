@@ -51,11 +51,12 @@ class Evaluator:
 
     def update_state(self, ground_truth_cameras, generated_cameras, ground_truth_images, generated_images):
         self.update_with_image(ground_truth_images, generated_images)
-        self.update_with_camera(ground_truth_cameras, generated_cameras)
+        if generated_cameras is not None:
+            self.update_with_camera(ground_truth_cameras, generated_cameras)
 
     def get_progress_bar_info(self):
         return OrderedDict([
-            ('img_rgbl1', float(next((x for x in self._image_generation_metrics if x.name == 'mae')).result())),
+            ('img_psnr', float(next((x for x in self._image_generation_metrics if x.name == 'psnr')).result())),
             ('img_lpips', float(next((x for x in self._image_generation_metrics if x.name == 'lpips')).result())),
             ('cam_loc', float(next((x for x in self._localization_metrics if x.name == 'loc-dist')).result())),
             ('cam_ang', float(next((x for x in self._localization_metrics if x.name == 'loc-angle')).result()))])
@@ -228,7 +229,7 @@ def main(loader: LoaderSwitch,
             progress.update()
     result = evaluator.result()
     with open(os.path.join(job_dir, 'results.json'), 'w+') as f:
-        json.dump(result, f)
+        json.dump(result, f, indent=4)
     print('Results:')
     for m, val in result.items():
         print(f'    {m}: {val:.6f}')

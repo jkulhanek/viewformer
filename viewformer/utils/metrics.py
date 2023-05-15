@@ -129,6 +129,8 @@ class Median(tf.metrics.Metric):
 
     def result(self):
         # Compute median
+        if self._store is None:
+            return 0  # Default value
         vals = tf.sort(self._store)
         if len(vals) % 2 == 1:
             return vals[(len(vals) - 1) // 2]
