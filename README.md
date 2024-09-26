@@ -2,7 +2,10 @@
 Official implementation of ViewFormer. 
 ViewFormer is a NeRF-free neural rendering model based on the transformer architecture.
 The model is capable of both novel view synthesis and camera pose estimation.
-It is evaluated on previously unseen 3D scenes.
+It is evaluated on previously unseen 3D scenes.<p>
+***ECCV 2022***
+
+</p>
 
 
 [Paper](https://arxiv.org/pdf/2203.10157.pdf)&nbsp;&nbsp;&nbsp;
@@ -10,6 +13,7 @@ It is evaluated on previously unseen 3D scenes.
 [Demo](https://colab.research.google.com/github/jkulhanek/viewformer/blob/master/notebooks/viewformer-playground.ipynb)
  
 <br>
+
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg?style=for-the-badge)](https://colab.research.google.com/github/jkulhanek/viewformer/blob/master/notebooks/viewformer-playground.ipynb)
 ![Python Versions](https://img.shields.io/badge/Python-3.7%20%7C%203.8%20%7C%203.9-blue)
